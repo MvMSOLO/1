@@ -1,0 +1,79 @@
+{
+  "query": {
+    "rawQuery": "Compare React and Vue for school and coding",
+    "normalizedQuery": "compare react and vue for school and coding",
+    "topics": ["Web Development", "Frameworks"],
+    "entities": [
+      { "name": "React", "type": "Framework" },
+      { "name": "Vue", "type": "Framework" }
+    ],
+    "queryType": "comparative"
+  },
+  "experience": "comparison",
+  "primaryItems": [
+    {
+      "title": "React vs Vue.js Comparison",
+      "description": "React uses a virtual DOM and component-centric approach with JSX, whereas Vue provides dynamic template syntax and reactive data-binding out of the box.",
+      "sourceIds": ["wiki-react", "wiki-vue"]
+    }
+  ],
+  "claims": [
+    {
+      "id": "claim-comp-1",
+      "text": "React requires understanding JSX and building custom routing and state solutions using external libraries.",
+      "sourceIds": ["wiki-react"],
+      "topicIds": ["Frameworks"],
+      "confidence": 0.88,
+      "claimType": "fact"
+    },
+    {
+      "id": "claim-comp-2",
+      "text": "Vue features an easier learning curve with simple HTML/CSS template structures, ideal for beginners and school projects.",
+      "sourceIds": ["wiki-vue"],
+      "topicIds": ["Frameworks"],
+      "confidence": 0.9,
+      "claimType": "fact"
+    }
+  ],
+  "sources": [
+    {
+      "id": "wiki-react",
+      "provider": "wikipedia",
+      "canonicalUrl": "https://en.wikipedia.org/wiki/React_(software)",
+      "title": "React (software) - Wikipedia",
+      "retrievedAt": "2026-08-13T12:00:00Z",
+      "sourceType": "wiki",
+      "excerpt": "React is a free and open-source front-end JavaScript library for building user interfaces based on components, maintained by Meta and community.",
+      "trustSignals": {
+        "authoritative": true,
+        "independentConfirmation": true
+      }
+    },
+    {
+      "id": "wiki-vue",
+      "provider": "wikipedia",
+      "canonicalUrl": "https://en.wikipedia.org/wiki/Vue.js",
+      "title": "Vue.js - Wikipedia",
+      "retrievedAt": "2026-08-13T12:00:00Z",
+      "sourceType": "wiki",
+      "excerpt": "Vue.js is an open-source model–view–viewmodel front-end JavaScript framework for building user interfaces and single-page applications.",
+      "trustSignals": {
+        "authoritative": true,
+        "independentConfirmation": true
+      }
+    }
+  ],
+  "relatedTopics": [
+    "Svelte vs React",
+    "Angular vs React",
+    "Vite Build Tooling",
+    "State Management in React"
+  ],
+  "metadata": {
+    "latencyMs": 115,
+    "providerMetrics": {
+      "wikipedia": { "latencyMs": 115, "success": true }
+    },
+    "cacheHit": true
+  }
+}

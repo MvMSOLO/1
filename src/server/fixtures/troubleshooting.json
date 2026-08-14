@@ -1,0 +1,82 @@
+{
+  "query": {
+    "rawQuery": "Why does my CS 1.6 game freeze only when I aim at players?",
+    "normalizedQuery": "why does my cs 16 game freeze only when i aim at players",
+    "topics": ["Gaming Troubleshooting", "Counter-Strike"],
+    "entities": [
+      { "name": "Counter-Strike 1.6", "type": "Video Game" }
+    ],
+    "queryType": "troubleshooting"
+  },
+  "experience": "troubleshooting",
+  "primaryItems": [
+    {
+      "title": "CS 1.6 Aim Freeze Symptom",
+      "description": "Game stutter or freeze when placing crosshairs on dynamic player entities or during target rendering.",
+      "sourceIds": ["forum-cs-1"]
+    },
+    {
+      "title": "Unsynchronized Hitbox rendering & OpenGL Drivers",
+      "description": "Legacy GoldSrc engine rendering glitches trigger frame rate drops when calculating player hitboxes on newer graphic pipelines.",
+      "sourceIds": ["forum-cs-2"]
+    }
+  ],
+  "claims": [
+    {
+      "id": "claim-ts-1",
+      "text": "Outdated cl_minmodels settings or custom HD player models trigger severe lag spikes on rendering pipelines.",
+      "sourceIds": ["forum-cs-1"],
+      "topicIds": ["Gaming Troubleshooting"],
+      "confidence": 0.85,
+      "claimType": "inference"
+    },
+    {
+      "id": "claim-ts-2",
+      "text": "Disabling 'raw input' (m_rawinput 1) or hardware mouse acceleration causes engine polling mismatch during fast cursor movements over players.",
+      "sourceIds": ["forum-cs-2"],
+      "topicIds": ["Gaming Troubleshooting"],
+      "confidence": 0.75,
+      "claimType": "opinion"
+    }
+  ],
+  "sources": [
+    {
+      "id": "forum-cs-1",
+      "provider": "hackernews",
+      "canonicalUrl": "https://news.ycombinator.com/item?id=legacy-cs-1",
+      "title": "HackerNews CS 1.6 Aim stutter issue discussion",
+      "retrievedAt": "2026-08-13T12:00:00Z",
+      "sourceType": "forum",
+      "excerpt": "A thread analyzing why the GoldSrc renderer stalls when players appear on screen, highlighting custom high-polygon models and model validation routines.",
+      "trustSignals": {
+        "independentConfirmation": false
+      }
+    },
+    {
+      "id": "forum-cs-2",
+      "provider": "github",
+      "canonicalUrl": "https://github.com/ValveSoftware/halflife/issues/aimfreeze",
+      "title": "Half-Life Engine Issue Tracker #aimfreeze",
+      "retrievedAt": "2026-08-13T12:00:00Z",
+      "sourceType": "repository",
+      "excerpt": "Github developers pointing to dynamic lighting shader and hardware rendering buffer calculations as main causes of screen freezes when aiming at avatars.",
+      "trustSignals": {
+        "independentConfirmation": true
+      }
+    }
+  ],
+  "relatedTopics": [
+    "GoldSrc OpenGL settings",
+    "cl_minmodels performance impact",
+    "m_rawinput Steam instructions",
+    "FPS optimization legacy games"
+  ],
+  "metadata": {
+    "latencyMs": 95,
+    "providerMetrics": {
+      "github": { "latencyMs": 50, "success": true },
+      "hackernews": { "latencyMs": 45, "success": true }
+    },
+    "cacheHit": true
+  }
+}
