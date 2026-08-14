@@ -1,6 +1,6 @@
 import { SearchProvider } from './SearchProvider.ts';
 import { SearchIntent, Source, SearchResult, Claim, ExperienceKind } from '../../types/index.ts';
-import { deduplicateSources } from '../deduplication/deduplicator.ts';
+import { deduplicateSources, getJaccardSimilarity } from '../deduplication/deduplicator.ts';
 import { rankSources } from '../ranking/ranker.ts';
 
 export class RetrievalCoordinator {
@@ -78,6 +78,7 @@ export class RetrievalCoordinator {
     // 3. Extract claims & identify contradictions
     const claims: Claim[] = [];
     const relatedTopics: string[] = [];
+    const warnings: string[] = [];
 
     // Derive ExperienceKind based on queryType
     let experience: ExperienceKind = 'overview';
@@ -113,6 +114,24 @@ export class RetrievalCoordinator {
       }
     });
 
+    // Simple heuristic-based contradiction detection
+    // If two claims have similar words but also conflicting terminology (like 'react' vs 'vue' or 'increase' vs 'decrease')
+    for (let i = 0; i < claims.length; i++) {
+      for (let j = i + 1; j < claims.length; j++) {
+        const sim = getJaccardSimilarity(claims[i].text, claims[j].text);
+        // If they are somewhat similar but have potentially conflicting statements
+        const hasContradictoryKeywords =
+          (claims[i].text.toLowerCase().includes('react') && claims[j].text.toLowerCase().includes('vue')) ||
+          (claims[i].text.toLowerCase().includes('opengl') && claims[j].text.toLowerCase().includes('raw input'));
+
+        if (sim > 0.2 && hasContradictoryKeywords) {
+          warnings.push(`Sources disagree on claims: "${claims[i].text.substring(0, 45)}..." vs "${claims[j].text.substring(0, 45)}..."`);
+          break;
+        }
+      }
+      if (warnings.length > 0) break;
+    }
+
     // Populate general related topics
     if (intent.topics.length > 0) {
       relatedTopics.push(...intent.topics);
@@ -135,6 +154,7 @@ export class RetrievalCoordinator {
       claims,
       sources: rankedSources,
       relatedTopics: Array.from(new Set(relatedTopics)),
+      warnings: warnings.length > 0 ? warnings : undefined,
       metadata: {
         latencyMs,
         providerMetrics,

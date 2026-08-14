@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
-import { Search, Loader2, Compass, AlertTriangle, ArrowRight, X, Clock } from 'lucide-react';
+import { Search, Loader2, Compass, AlertTriangle, ArrowRight, X, Clock, HelpCircle } from 'lucide-react';
 import { SearchResult } from '../types';
 
 export default function App() {
@@ -243,6 +243,19 @@ export default function App() {
                 />
               </form>
             </div>
+
+            {/* Contradiction Indication Warning Display */}
+            {currentResult.warnings && currentResult.warnings.length > 0 && (
+              <div className="p-4 bg-[#f1c40f]/10 border border-[#f1c40f]/30 rounded-xl flex items-start space-x-3">
+                <HelpCircle className="w-5 h-5 text-[#f1c40f] shrink-0 mt-0.5" />
+                <div className="space-y-1">
+                  <span className="text-xs uppercase font-mono tracking-wider text-[#f1c40f]">Contradictory Claims Discovered</span>
+                  <p className="text-sm text-[#c5c6c7] font-light leading-relaxed">
+                    {currentResult.warnings[0]}
+                  </p>
+                </div>
+              </div>
+            )}
 
             {/* Dynamic Results Layout */}
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
