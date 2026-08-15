@@ -20,8 +20,8 @@ test.describe('NEXUS Web App scenarios', () => {
     await page.locator('text=Black hole - Wikipedia').click();
     await expect(page.locator('text=Evidence Details')).toBeVisible();
 
-    // Close drawer using exact unique className or role matching
-    await page.locator('button.text-\\[\\#8a8d91\\]').click();
+    // Close drawer using exact unique test id or specific selector inside evidence drawer
+    await page.locator('div.animate-slideIn button').click();
   });
 
   test('Comparative query scenario', async ({ page }) => {

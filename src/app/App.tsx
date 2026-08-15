@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
-import { Search, Loader2, Compass, AlertTriangle, ArrowRight, X, Clock, HelpCircle } from 'lucide-react';
+import { Search, Loader2, Compass, AlertTriangle, ArrowRight, X, Clock, HelpCircle, Globe, ShieldCheck } from 'lucide-react';
 import { SearchResult } from '../types';
+import { Language, getTranslation } from '../lib/i18n';
 
 export default function App() {
   const [query, setQuery] = useState('');
@@ -9,8 +10,11 @@ export default function App() {
   const [errorMessage, setErrorMessage] = useState('');
   const [recentSearches, setRecentSearches] = useState<string[]>([]);
   const [selectedSource, setSelectedSource] = useState<any | null>(null);
+  const [lang, setLang] = useState<Language>('en');
 
   const inputRef = useRef<HTMLInputElement>(null);
+
+  const t = (key: string) => getTranslation(lang, key);
 
   // Load and Save Recent Searches
   useEffect(() => {
@@ -59,14 +63,13 @@ export default function App() {
     saveSearch(searchQuery);
     setSelectedSource(null);
 
-    // Progressive loading states simulator to reflect standard speculative state progress
     try {
       setStatus('discovering');
-      await new Promise(r => setTimeout(r, 400));
+      await new Promise(r => setTimeout(r, 300));
       setStatus('sources_found');
-      await new Promise(r => setTimeout(r, 450));
-      setStatus('refining');
       await new Promise(r => setTimeout(r, 350));
+      setStatus('refining');
+      await new Promise(r => setTimeout(r, 300));
       setStatus('building');
 
       const res = await fetch('http://localhost:3001/api/search', {
@@ -106,9 +109,26 @@ export default function App() {
           <Compass className="w-6 h-6 text-[#66fcf1]" />
           <span className="font-mono font-semibold tracking-widest text-[#f5f5f7] text-lg">NEXUS</span>
         </div>
-        <div className="text-xs font-mono text-[#8a8d91] flex items-center space-x-2">
-          <span className="border border-gray-800 px-1.5 py-0.5 rounded">⌘ K</span>
-          <span>to search</span>
+
+        <div className="flex items-center space-x-4">
+          {/* i18n Language Selector */}
+          <div className="flex items-center space-x-1.5 bg-[#1f2833]/50 border border-gray-800 rounded-lg px-2 py-1 text-xs font-mono">
+            <Globe className="w-3.5 h-3.5 text-[#8a8d91]" />
+            {(['en', 'uz', 'ru'] as Language[]).map((l) => (
+              <button
+                key={l}
+                onClick={() => setLang(l)}
+                className={`uppercase px-1.5 py-0.5 rounded transition ${lang === l ? 'bg-[#66fcf1]/20 text-[#66fcf1] font-semibold' : 'text-[#8a8d91] hover:text-white'}`}
+              >
+                {l}
+              </button>
+            ))}
+          </div>
+
+          <div className="text-xs font-mono text-[#8a8d91] hidden sm:flex items-center space-x-2">
+            <span className="border border-gray-800 px-1.5 py-0.5 rounded">⌘ K</span>
+            <span>{t('toSearch')}</span>
+          </div>
         </div>
       </header>
 
@@ -122,7 +142,7 @@ export default function App() {
                 NEXUS
               </h1>
               <p className="text-lg font-light text-[#8a8d91] tracking-wide">
-                Find the part of the web that matters.
+                {t('tagline')}
               </p>
             </div>
 
@@ -137,18 +157,18 @@ export default function App() {
                 type="text"
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
-                placeholder="What are you looking for?"
+                placeholder={t('placeholder')}
                 className="bg-transparent text-white placeholder-[#8a8d91] focus:outline-none w-full text-lg"
                 autoFocus
               />
               <button type="submit" className="text-xs uppercase tracking-wider font-mono px-3 py-1 bg-[#66fcf1]/10 text-[#66fcf1] rounded hover:bg-[#66fcf1]/20 transition-all cursor-pointer">
-                Search
+                {t('search')}
               </button>
             </form>
 
             {/* Quick Destination Shortcuts */}
             <div className="flex flex-wrap gap-3 items-center justify-center">
-              <span className="text-xs font-mono text-[#8a8d91] uppercase tracking-wider">Shortcuts:</span>
+              <span className="text-xs font-mono text-[#8a8d91] uppercase tracking-wider">{t('shortcuts')}</span>
               {['ChatGPT', 'YouTube', 'Instagram'].map(dest => (
                 <button
                   key={dest}
@@ -165,10 +185,10 @@ export default function App() {
               <div className="w-full border-t border-gray-900/80 pt-6 space-y-3">
                 <div className="flex items-center justify-between">
                   <span className="text-xs font-mono text-[#8a8d91] uppercase tracking-wider flex items-center gap-1.5">
-                    <Clock className="w-3.5 h-3.5" /> Recent explorations
+                    <Clock className="w-3.5 h-3.5" /> {t('recent')}
                   </span>
                   <button onClick={clearHistory} className="text-[10px] uppercase tracking-wider font-mono text-[#8a8d91] hover:text-[#e74c3c] transition-all cursor-pointer">
-                    Clear
+                    {t('clear')}
                   </button>
                 </div>
                 <div className="flex flex-wrap gap-2">
@@ -193,16 +213,16 @@ export default function App() {
             <Loader2 className="w-10 h-10 text-[#66fcf1] animate-spin" />
             <div className="text-center space-y-2">
               <div className="text-xs font-mono text-[#66fcf1] tracking-[0.2em] uppercase">
-                {status === 'discovering' && 'DISCOVERING'}
-                {status === 'sources_found' && 'SOURCES FOUND'}
-                {status === 'refining' && 'REFINING'}
-                {status === 'building' && 'BUILDING RESULT'}
+                {status === 'discovering' && t('discovering')}
+                {status === 'sources_found' && t('sourcesFound')}
+                {status === 'refining' && t('refining')}
+                {status === 'building' && t('building')}
               </div>
               <p className="text-sm font-light text-[#8a8d91]">
-                {status === 'discovering' && 'Scanning public interfaces...'}
-                {status === 'sources_found' && 'Resolving source domains...'}
-                {status === 'refining' && 'Evaluating relevance and removing duplicates...'}
-                {status === 'building' && 'Synthesizing knowledge experience...'}
+                {status === 'discovering' && t('discoveringDesc')}
+                {status === 'sources_found' && t('sourcesFoundDesc')}
+                {status === 'refining' && t('refiningDesc')}
+                {status === 'building' && t('buildingDesc')}
               </p>
             </div>
           </div>
@@ -213,14 +233,14 @@ export default function App() {
           <div className="w-full max-w-md bg-[#e74c3c]/10 border border-[#e74c3c]/40 rounded-xl p-6 text-center space-y-4 my-auto">
             <AlertTriangle className="w-8 h-8 text-[#e74c3c] mx-auto" />
             <div className="space-y-1">
-              <h3 className="text-[#f5f5f7] font-semibold">Search failed</h3>
+              <h3 className="text-[#f5f5f7] font-semibold">{t('searchFailed')}</h3>
               <p className="text-sm text-[#8a8d91]">{errorMessage}</p>
             </div>
             <button
               onClick={() => { setStatus('idle'); setCurrentResult(null); }}
               className="px-4 py-2 bg-gray-800 text-sm text-[#f5f5f7] rounded-lg hover:bg-gray-700 transition-all font-mono cursor-pointer"
             >
-              Retry
+              {t('retry')}
             </button>
           </div>
         )}
@@ -249,7 +269,7 @@ export default function App() {
               <div className="p-4 bg-[#f1c40f]/10 border border-[#f1c40f]/30 rounded-xl flex items-start space-x-3">
                 <HelpCircle className="w-5 h-5 text-[#f1c40f] shrink-0 mt-0.5" />
                 <div className="space-y-1">
-                  <span className="text-xs uppercase font-mono tracking-wider text-[#f1c40f]">Contradictory Claims Discovered</span>
+                  <span className="text-xs uppercase font-mono tracking-wider text-[#f1c40f]">{t('contradictionTitle')}</span>
                   <p className="text-sm text-[#c5c6c7] font-light leading-relaxed">
                     {currentResult.warnings[0]}
                   </p>
@@ -266,7 +286,7 @@ export default function App() {
                   <div className="space-y-6">
                     <div className="border border-gray-800/80 rounded-xl p-6 bg-[#1f2833]/15 space-y-4">
                       <h2 className="text-xl font-light text-white border-b border-gray-800/80 pb-3 uppercase tracking-wider font-mono text-[#66fcf1]">
-                        Overview
+                        {t('overview')}
                       </h2>
                       {currentResult.primaryItems.map((item, idx) => (
                         <div key={idx} className="space-y-2">
@@ -282,7 +302,7 @@ export default function App() {
                   <div className="space-y-6">
                     <div className="border border-gray-800/80 rounded-xl p-6 bg-[#1f2833]/15 space-y-6">
                       <h2 className="text-xl font-light text-white border-b border-gray-800/80 pb-3 uppercase tracking-wider font-mono text-[#66fcf1]">
-                        Comparison Analysis
+                        {t('comparison')}
                       </h2>
                       {currentResult.primaryItems.map((item, idx) => (
                         <div key={idx} className="space-y-4">
@@ -327,22 +347,22 @@ export default function App() {
                   <div className="space-y-6">
                     <div className="border border-[#45a29e]/30 rounded-xl p-6 bg-[#1f2833]/15 space-y-6">
                       <h2 className="text-xl font-light text-white border-b border-gray-800/80 pb-3 uppercase tracking-wider font-mono text-[#66fcf1]">
-                        Troubleshooting Diagnosis
+                        {t('troubleshooting')}
                       </h2>
                       <div className="space-y-4">
                         <div className="flex items-start gap-3">
-                          <div className="px-2 py-0.5 rounded bg-[#e74c3c]/10 text-[#e74c3c] text-xs font-mono uppercase tracking-wide shrink-0">Symptom</div>
+                          <div className="px-2 py-0.5 rounded bg-[#e74c3c]/10 text-[#e74c3c] text-xs font-mono uppercase tracking-wide shrink-0">{t('symptom')}</div>
                           <p className="text-sm text-[#c5c6c7] font-light">Freeze or complete screen hang when placing crosshair or moving mouse over enemy models.</p>
                         </div>
                         <div className="flex items-start gap-3">
-                          <div className="px-2 py-0.5 rounded bg-[#f1c40f]/10 text-[#f1c40f] text-xs font-mono uppercase tracking-wide shrink-0">Diagnosis</div>
+                          <div className="px-2 py-0.5 rounded bg-[#f1c40f]/10 text-[#f1c40f] text-xs font-mono uppercase tracking-wide shrink-0">{t('diagnosis')}</div>
                           <p className="text-sm text-[#c5c6c7] font-light">OpenGL buffering error. Legacy render engine stalls resolving player hitboxes / polygons with modern driver pipelines.</p>
                         </div>
                       </div>
 
                       {/* Step-by-step diagnostic actions */}
                       <div className="space-y-3 pt-4 border-t border-gray-800/80">
-                        <h4 className="text-xs uppercase tracking-wider font-mono text-[#8a8d91]">Recommended Actions</h4>
+                        <h4 className="text-xs uppercase tracking-wider font-mono text-[#8a8d91]">{t('recommendedActions')}</h4>
                         <ol className="list-decimal list-inside space-y-2 text-sm text-[#c5c6c7] font-light">
                           <li>Open Steam console, try setting <code className="px-1 py-0.5 bg-gray-900 rounded font-mono text-[#66fcf1]">m_rawinput 1</code></li>
                           <li>Ensure default player skins are active via setting <code className="px-1 py-0.5 bg-gray-900 rounded font-mono text-[#66fcf1]">cl_minmodels 1</code></li>
@@ -355,7 +375,7 @@ export default function App() {
 
                 {/* Unified claims list below major components */}
                 <div className="space-y-4">
-                  <h3 className="text-xs font-mono uppercase tracking-wider text-[#8a8d91]">Key Extracted Claims</h3>
+                  <h3 className="text-xs font-mono uppercase tracking-wider text-[#8a8d91]">{t('extractedClaims')}</h3>
                   <div className="space-y-3">
                     {currentResult.claims.map((claim, idx) => (
                       <div key={idx} className="p-4 border border-gray-800 bg-[#1f2833]/5 rounded-lg flex items-start justify-between gap-4">
@@ -391,7 +411,7 @@ export default function App() {
               <div className="space-y-6">
                 {/* Sources list */}
                 <div className="space-y-4">
-                  <h3 className="text-xs font-mono uppercase tracking-wider text-[#8a8d91]">Evidence Sources</h3>
+                  <h3 className="text-xs font-mono uppercase tracking-wider text-[#8a8d91]">{t('evidenceSources')}</h3>
                   <div className="space-y-3">
                     {currentResult.sources.map((src, idx) => (
                       <div
@@ -400,8 +420,8 @@ export default function App() {
                         className="p-4 border border-gray-800 bg-[#1f2833]/10 hover:border-[#66fcf1]/30 rounded-xl cursor-pointer transition-all space-y-2 relative group"
                       >
                         <div className="flex items-center justify-between">
-                          <span className="text-[10px] font-mono uppercase tracking-wider text-[#66fcf1]">
-                            {src.provider}
+                          <span className="text-[10px] font-mono uppercase tracking-wider text-[#66fcf1] flex items-center gap-1">
+                            {src.provider} {src.trustSignals?.authoritative && <ShieldCheck className="w-3 h-3 text-[#2ecc71]" />}
                           </span>
                           <span className="text-xs font-mono text-[#8a8d91]">
                             {src.sourceType}
@@ -422,7 +442,7 @@ export default function App() {
 
                 {/* Related Explorations */}
                 <div className="space-y-4 border-t border-gray-800/80 pt-6">
-                  <h3 className="text-xs font-mono uppercase tracking-wider text-[#8a8d91]">Explore Further</h3>
+                  <h3 className="text-xs font-mono uppercase tracking-wider text-[#8a8d91]">{t('exploreFurther')}</h3>
                   <div className="flex flex-col gap-2">
                     {currentResult.relatedTopics.map((topic, idx) => (
                       <button
@@ -452,7 +472,7 @@ export default function App() {
             <div className="space-y-6">
               <div className="flex items-center justify-between">
                 <span className="text-xs font-mono uppercase tracking-wider text-[#66fcf1]">
-                  Evidence Details
+                  {t('evidenceDetails')}
                 </span>
                 <button onClick={() => setSelectedSource(null)} className="text-[#8a8d91] hover:text-white transition cursor-pointer">
                   <X className="w-5 h-5" />
@@ -484,14 +504,14 @@ export default function App() {
 
               {/* Dynamic Metadata / Trust Signals */}
               <div className="space-y-3 pt-4 border-t border-gray-800/80">
-                <h4 className="text-xs uppercase tracking-wider font-mono text-[#8a8d91]">Trust Signals</h4>
+                <h4 className="text-xs uppercase tracking-wider font-mono text-[#8a8d91]">{t('trustSignals')}</h4>
                 <div className="grid grid-cols-2 gap-3">
                   <div className="p-3 bg-gray-900/30 rounded border border-gray-800 text-xs">
-                    <span className="block text-[#8a8d91]">Authoritative</span>
+                    <span className="block text-[#8a8d91]">{t('authoritative')}</span>
                     <span className="font-semibold text-[#66fcf1]">{selectedSource.trustSignals?.authoritative ? 'YES' : 'NO'}</span>
                   </div>
                   <div className="p-3 bg-gray-900/30 rounded border border-gray-800 text-xs">
-                    <span className="block text-[#8a8d91]">Independent Confirmation</span>
+                    <span className="block text-[#8a8d91]">{t('independent')}</span>
                     <span className="font-semibold text-[#66fcf1]">{selectedSource.trustSignals?.independentConfirmation ? 'YES' : 'NO'}</span>
                   </div>
                 </div>
@@ -505,7 +525,7 @@ export default function App() {
                 rel="noopener noreferrer"
                 className="w-full py-3 bg-[#66fcf1] text-[#0b0c10] rounded-xl hover:bg-white text-center font-semibold text-sm transition-all block tracking-wide cursor-pointer"
               >
-                Go to original web source
+                {t('goToOriginal')}
               </a>
             </div>
           </div>
