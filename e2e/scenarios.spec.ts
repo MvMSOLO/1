@@ -14,10 +14,10 @@ test.describe('NEXUS Web App scenarios', () => {
     await input.press('Enter');
 
     // Progressive phases transition to Done
-    await expect(page.locator('text=Overview')).toBeVisible({ timeout: 10000 });
+    await expect(page.getByRole('heading', { name: 'Overview' })).toBeVisible({ timeout: 10000 });
 
     // Open first source drawer
-    await page.locator('text=Black hole - Wikipedia').click();
+    await page.locator('h4').first().click();
     await expect(page.locator('text=Evidence Details')).toBeVisible();
 
     // Close drawer using exact unique test id or specific selector inside evidence drawer
